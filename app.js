@@ -90,12 +90,27 @@ app.get("/listings/:id/edit", async (req, res) => {
     res.render("./listings/edit.ejs", { listing })
 });
 
-// update route
+// Update route
 app.put("/listings/:id", async (req, res) => {
     let { id } = req.params;
-    await Listing.findByIdAndUpdate(id, { ...req.body.listing });
-    res.redirect(`/listings/${id}`);
-})
+    const updatedListing = req.body.listing;
+
+    // Ensure image is cast correctly
+    if (!updatedListing.image || !updatedListing.image.url) {
+        updatedListing.image = {
+            filename: "listingimage",
+            url: "https://images.unsplash.com/photo-1625505826533-5c80aca7d157?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxzZWFyY2h8MTJ8fGdvYXxlbnwwfHwwfHx8MA%3D%3D&auto=format&fit=crop&w=800&q=60"
+        };
+    }
+
+    try {
+        await Listing.findByIdAndUpdate(id, { ...updatedListing });
+        res.redirect(`/listings/${id}`);
+    } catch (error) {
+        console.error("Error updating listing:", error);
+        res.status(400).send("Error updating listing");
+    }
+});
 
 //delete route
 app.delete("/listings/:id" ,async (req,res)=>{
