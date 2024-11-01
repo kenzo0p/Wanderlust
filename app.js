@@ -5,6 +5,8 @@ const port = 8080;
 const Listing = require('./models/listing.models.js');
 const path = require("path");
 const methodOverride = require('method-override');
+const ejsMate = require("ejs-mate");
+
 
 
 // Set up view engine and middleware
@@ -13,6 +15,8 @@ app.set("views", path.join(__dirname, "views"));
 app.use(express.urlencoded({ extended: true }));
 app.use(express.json()); // Add this if you plan to handle JSON data
 app.use(methodOverride('_method'));
+app.engine('ejs' ,ejsMate);
+app.use(express.static(path.join(__dirname,"/public")));
 
 // Connect to MongoDB
 main().then(() => {

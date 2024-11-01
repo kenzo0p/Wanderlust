@@ -1,37 +1,33 @@
-<!DOCTYPE html>
-<html lang="en">
+<% layout('/layouts/boilerplate') %>
 
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>WanderLust</title>
-</head>
+    <body>
+        <div class="row mt-3">
+            <div class="col-8 offset-3">
+                <h3>Listing Details : </h3>
+            </div>
+            <div class="card col-6 offset-3 show-card">
+                <img src="<%= listing.image.url %>" class="card-img-top show-img" alt="listing image">
+                <div class="card-body">
+                    <p class="card-text">
+                        <b>
+                            <%= listing.title %>
+                        </b><br>
+                        <%= listing.description %> <br>
+                            &#8377; <%= listing.price.toLocaleString("en-IN") %> <br>
+                                <%= listing.location %> <br>
+                                    <%= listing.country %>
+                    </p>
+                </div>
+            </div>
+            <br>
+        </div>
+        <div class="btns">
+            <a href="/listings/<%=listing._id%>/edit" class="btn btn-outline-primary col-1 offset-3">Edit</a>        
+            <form action="/listings/<%=listing._id%>?_method=DELETE" method="POST">
+                <button class="btn btn-outline-danger  offset-5">Delete</button>
+            </form>
+        </div>
+    </div>
+    </body>
 
-<body>
-    <h3>Listing Details : </h3>
-    <ul>
-        <li>
-            <%= listing.title %>
-        </li>
-        <li>
-            <%= listing.description %>
-        </li>
-        <li>
-            &#8377; <%= listing.price.toLocaleString("en-IN") %>
-        </li>
-        <li>
-            <%= listing.location %>
-        </li>
-        <li>
-            <%= listing.country %>
-        </li>
-    </ul>
-    <br>
-    <a href="/listings/<%=listing._id%>/edit">Edit this listing</a>
-    <br><br>
-    <form action="/listings/<%=listing._id%>?_method=DELETE" method="POST">
-        <button>Delete this listing</button>
-    </form>
-</body>
-
-</html>
+    </html>
