@@ -6,25 +6,21 @@ const Listing = require('./models/listing.models.js');
 const path = require("path");
 const methodOverride = require('method-override');
 const ejsMate = require("ejs-mate");
-
-
+const wrapAsync = require('./utils/wrapAsync.js')
+const ExpressError = require('./utils/ExpressError.js')
+const { listingSchema } = require('./schema.js'); // Note: Destructure listingSchema from your schema file
 
 // Set up view engine and middleware
 app.set("view engine", "ejs");
 app.set("views", path.join(__dirname, "views"));
 app.use(express.urlencoded({ extended: true }));
-app.use(express.json()); // Add this if you plan to handle JSON data
+app.use(express.json());
 app.use(methodOverride('_method'));
-app.engine('ejs' ,ejsMate);
-app.use(express.static(path.join(__dirname,"/public")));
+app.engine('ejs', ejsMate);
+app.use(express.static(path.join(__dirname, "/public")));
 
 // Connect to MongoDB
-main().then(() => {
-    console.log("Connected to db");
-}).catch((err) => {
-    console.log(err);
-});
-
+main().then(() => console.log("Connected to db")).catch(err => console.log(err));
 async function main() {
     await mongoose.connect('mongodb://127.0.0.1:27017/wanderlust');
 }
@@ -44,6 +40,16 @@ app.get('/listings', async (req, res) => {
         res.status(500).send("Internal Server Error");
     }
 });
+
+// Validation Middleware
+const validateListing = (req, res, next) => {
+    const { error } = listingSchema.validate(req.body);
+    if (error) {
+        // Use error.details[0].message to provide specific validation feedback
+        return next(new ExpressError(400, error.details[0].message));
+    }
+    next();
+};
 
 // New listing form route
 app.get("/listings/new", (req, res) => {
@@ -65,11 +71,11 @@ app.get("/listings/:id", async (req, res) => {
     }
 });
 
-// Create new listing route
-app.post("/listings", async (req, res) => {
+// Create new listing route with validation middleware
+app.post("/listings", validateListing, wrapAsync(async (req, res, next) => {
     const { listing } = req.body;
 
-    // Ensure the image field is correctly structured
+    // Set default image if none provided
     if (!listing.image || !listing.image.url) {
         listing.image = {
             filename: "listingimage",
@@ -83,23 +89,23 @@ app.post("/listings", async (req, res) => {
         res.redirect("/listings");
     } catch (error) {
         console.error("Error saving listing:", error);
-        res.status(400).send("Error saving listing");
+        next(error);
     }
-});
+}));
 
-//Edit route
+// Edit route
 app.get("/listings/:id/edit", async (req, res) => {
-    let { id } = req.params;
+    const { id } = req.params;
     const listing = await Listing.findById(id);
-    res.render("./listings/edit.ejs", { listing })
+    res.render("./listings/edit.ejs", { listing });
 });
 
 // Update route
-app.put("/listings/:id", async (req, res) => {
-    let { id } = req.params;
+app.put("/listings/:id", validateListing, async (req, res, next) => {
+    const { id } = req.params;
     const updatedListing = req.body.listing;
 
-    // Ensure image is cast correctly
+    // Set default image if none provided
     if (!updatedListing.image || !updatedListing.image.url) {
         updatedListing.image = {
             filename: "listingimage",
@@ -112,16 +118,32 @@ app.put("/listings/:id", async (req, res) => {
         res.redirect(`/listings/${id}`);
     } catch (error) {
         console.error("Error updating listing:", error);
-        res.status(400).send("Error updating listing");
+        next(error);
     }
 });
 
-//delete route
-app.delete("/listings/:id" ,async (req,res)=>{
-    let { id } = req.params;
-    let deletedListing = await Listing.findByIdAndDelete(id);
-    res.redirect("/listings");
-})
+// Delete route
+app.delete("/listings/:id", async (req, res, next) => {
+    const { id } = req.params;
+    try {
+        await Listing.findByIdAndDelete(id);
+        res.redirect("/listings");
+    } catch (error) {
+        console.error("Error deleting listing:", error);
+        next(error);
+    }
+});
+
+// Catch-all route for undefined routes
+app.all("*", (req, res, next) => {
+    next(new ExpressError(404, "Page Not Found"));
+});
+
+// Error-handling middleware
+app.use((err, req, res, next) => {
+    const { statusCode = 500, message = "Something went wrong" } = err;
+    res.status(statusCode).render("error.ejs", { err });
+});
 
 // Start the server
 app.listen(port, () => {

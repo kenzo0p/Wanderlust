@@ -4,47 +4,69 @@
         <div class="row">
             <div class="col-8 offset-2">
                 <h3 class="py-4">Edit your Listings</h3>
-                <form method="POST" action="/listings/<%= listing._id %>?_method=PUT" class="py-3">
+                <form method="POST" action="/listings/<%= listing._id %>?_method=PUT" class="py-3 needs-validation"
+                    novalidate>
                     <div class="mb-3">
                         <label for="title" class="form-label">Title : </label>
-                        <input type="text" class="form-control" name="listing[title]" value="<%= listing.title %>">
+                        <input type="text" class="form-control" required name="listing[title]"
+                            value="<%= listing.title %>">
+                        <div class="invalid-feedback">
+                            You Must Write A Title!
+                        </div>
                     </div>
 
                     <div class="mb-3">
                         <label for="description" class="form-label">Description : </label>
-                        <textarea name="listing[description]" id="" value="<%=listing.description%>"
-                            class="form-control"></textarea>
+                        <textarea name="listing[description]" required id="" value="<%=listing.description%>"
+                            class="form-control"><%=listing.description%></textarea>
+                        <div class="invalid-feedback">
+                            You Must Write A Description!
+                        </div>
                     </div>
                     <div class="mb-3">
                         <label for="description" class="form-label">Image : </label>
-                        <input type="text" class="form-control" name="listing[image]" value="<%= listing.image.url%>">
+                        <input type="text" class="form-control" required name="listing[image]"
+                            value="<%= listing.image.url%>">
+                        <div class="invalid-feedback">
+                            Image Required
+                        </div>
                     </div>
 
                     <div class="row">
                         <div class="mb-3 col-md-4">
                             <label for="price" class="form-label">Price : </label>
-                            <input type="number" class="form-control" name="listing[price]"
+                            <input type="number" class="form-control" required name="listing[price]"
                                 value="<%= listing.price %>">
+                            <div class="invalid-feedback">
+                                Please Enter A Valid Price!
+                            </div>
                         </div>
 
 
                         <div class="mb-3 col-md-8">
                             <label for="country" class="form-label">Country : </label>
-                            <input type="text" class="form-control" name="listing[country]"
+                            <input type="text" class="form-control" required name="listing[country]"
                                 value="<%= listing.country %>">
+                            <div class="invalid-feedback">
+                                Please Enter The Coutry Name!
+                            </div>
                         </div>
                     </div>
 
                     <div class="mb-3">
                         <label for="loaction" class="form-label">Location : </label>
-                        <input type="text" class="form-control" name="listing[location]"
+                        <input type="text" class="form-control" required name="listing[location]"
                             value="<%= listing.location %>">
+                        <div class="invalid-feedback">
+                            Please Enter The Location!
+                        </div>
                     </div>
                     <button class="btn btn-dark add-btn">Edit</button>
 
                 </form>
             </div>
         </div>
+        <script src="/JavaScript/script.js"></script>
     </body>
 
     </html>

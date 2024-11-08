@@ -4,39 +4,60 @@
         <div class="row">
             <div class="col-8 offset-2">
                 <h3 class="py-4">Create New Listings</h3>
-                <form action="/listings" method="post" class="py-3">
+                <form action="/listings" method="post" class="py-3 needs-validation" novalidate >
                     <div class="mb-3">
                         <label for="title" class="form-label">Title : </label>
-                        <input type="text" class="form-control" name="listing[title]" placeholder="Add a catchy title">
+                        <input required type="text" class="form-control" name="listing[title]" placeholder="Add a catchy title">
+                        <div class="valid-feedback">
+                            Title Looks Good!
+                        </div>
+                        <div class="invalid-feedback">
+                            You Must Write A Title!
+                        </div>
                     </div>
 
                     <div class="mb-3">
                         <label for="description" class="form-label">Description : </label>
                         <textarea name="listing[description]" id="" placeholder="Enter Description"
-                            class="form-control"></textarea>
+                            class="form-control" required></textarea>
+                            <div class="invalid-feedback">
+                                You Must Write A Description!
+                            </div>
                     </div>
                     <div class="mb-3">
-                        <label for="description" class="form-label">Image : </label>
+                        <label for="image" class="form-label">Image : </label>
                         <input type="text" class="form-control" name="listing[image]"
                             placeholder="Enter image URL/LINK">
+                            <div class="invalid-feedback">
+                                Image Required
+                            </div>
                     </div>
 
                     <div class="row">
                         <div class="mb-3 col-md-4">
                             <label for="price" class="form-label">Price : </label>
-                            <input type="number" class="form-control" name="listing[price]" placeholder="12000">
+                            <input required type="number"  class="form-control" name="listing[price]" placeholder="12000">
+                            <div class="invalid-feedback">
+                                Please Enter A Valid Price!
+                            </div>
                         </div>
                     
 
                     <div class="mb-3 col-md-8">
                         <label for="country" class="form-label">Country : </label>
-                        <input type="text" class="form-control" name="listing[country]" placeholder="India">
+                        <input required type="text" class="form-control" name="listing[country]" placeholder="India">
+                        <div class="invalid-feedback">
+                            Please Enter The Coutry Name!
+                        </div>
                     </div>
                 </div>
 
                     <div class="mb-3">
                         <label for="loaction" class="form-label">Location : </label>
-                        <input type="text" class="form-control" name="listing[location]" placeholder="Pune">
+                        <input required type="text" class="form-control" name="listing[location]" placeholder="Pune">
+                        <div class="invalid-feedback">
+                            Please Enter The Location!
+                        </div>
                     </div>
                     <button class="btn btn-dark add-btn">Add</button>
 
