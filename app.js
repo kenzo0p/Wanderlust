@@ -8,8 +8,10 @@ const methodOverride = require('method-override');
 const ejsMate = require("ejs-mate");
 const wrapAsync = require('./utils/wrapAsync.js')
 const ExpressError = require('./utils/ExpressError.js')
-const { listingSchema } = require('./schema.js'); // Note: Destructure listingSchema from your schema file
+const { listingSchema , reviewSchema } = require('./schema.js'); // Note: Destructure listingSchema from your schema file
+const Review = require('./models/reviews.model.js')
 
+console.log("hello")
 // Set up view engine and middleware
 app.set("view engine", "ejs");
 app.set("views", path.join(__dirname, "views"));
@@ -50,6 +52,16 @@ const validateListing = (req, res, next) => {
     }
     next();
 };
+const validateReview = (req, res, next) => {
+    console.log("middleware")
+    console.log(req.body.review);
+    const { error } = reviewSchema.validate(req.body);
+    if (error) {
+        // Use error.details[0].message to provide specific validation feedback
+        return next(new ExpressError(400, error.details[0].message));
+    }
+    next();
+};
 
 // New listing form route
 app.get("/listings/new", (req, res) => {
@@ -60,7 +72,7 @@ app.get("/listings/new", (req, res) => {
 app.get("/listings/:id", async (req, res) => {
     const { id } = req.params;
     try {
-        const listing = await Listing.findById(id);
+        const listing = await Listing.findById(id).populate("reviews")
         if (!listing) {
             return res.status(404).send("Listing not found");
         }
@@ -133,6 +145,20 @@ app.delete("/listings/:id", async (req, res, next) => {
         next(error);
     }
 });
+
+// Reviews
+// post route
+app.post('/listings/:id/reviews' ,validateReview, wrapAsync(async(req,res)=>{
+    let listing = await Listing.findById(req.params.id)
+    let newReview = new Review(req.body.review);
+
+
+    listing.reviews.push(newReview)
+    await newReview.save()
+    await listing.save()
+
+    res.redirect(`/listings/${listing._id }`)
+}))
 
 // Catch-all route for undefined routes
 app.all("*", (req, res, next) => {
