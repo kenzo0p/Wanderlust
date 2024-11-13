@@ -24,18 +24,30 @@
                 <button class="btn btn-outline-danger  offset-5">Delete</button>
             </form>
         </div>
-        <h4 class="col-8 offset-3">Leave A Review</h4>
-        <form action="">
-            <div>
-                <label for="rating">Rating</label>
-                <input type="range" min="1" max="5" id="rating" name="review[rating]">
+        <hr>
+        <div class="col-8 offset-3 mb-3">
+        <h4 >Leave A Review</h4>
+        <form action="/listings/<%=listing._id %>/reviews" method="post"  class="needs-validation" novalidate>
+            <div class="mb-3 mt-3">
+                <label for="rating" class="form-label">Rating</label>
+                <input class="form-range" type="range" min="1" max="5" id="rating" name="review[rating]" >
             </div>
-            <div>
-                <label for="commment">Comment</label>
-                <textarea name="review[commment]" id="comment" cols="30" rows="10"></textarea>
+            <div class="mb-3 mt-3">
+                <label for="comment">Comment</label>
+                <textarea required class="form-control" name="review[comment]" id="comment" cols="30" rows="5"></textarea>
+                <div class="invalid-feedback">
+                    Please add some comment for review
+                </div>
             </div>
-            <button>submit</button>
+            <button class="btn btn-outline-dark">submit</button>
         </form>
+
+        <hr>
+
+
+        <h4>All Reviews</h4>
+        <p><%=listing.reviews%></p>
+    </div>
     </div>
     </body>
 
