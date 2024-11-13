@@ -64,7 +64,7 @@ body{
 .listing-link{
     text-decoration: none !important;
 }
-.card{
+.listing-card{
     border: none !important;
     margin-bottom: 2rem;
 }

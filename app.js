@@ -160,6 +160,16 @@ app.post('/listings/:id/reviews' ,validateReview, wrapAsync(async(req,res)=>{
     res.redirect(`/listings/${listing._id }`)
 }))
 
+// delete route for reviews
+app.delete('/listings/:id/reviews/:reviewId' ,wrapAsync(async(req,res)=>{
+    let {id , reviewId} = req.params
+
+    await Listing.findByIdAndUpdate(id,{$pull:{reviews:reviewId}})
+    await Review.findByIdAndDelete(reviewId);
+
+    res.redirect(`/listings/${id}`)
+}))
+
 // Catch-all route for undefined routes
 app.all("*", (req, res, next) => {
     next(new ExpressError(404, "Page Not Found"));
