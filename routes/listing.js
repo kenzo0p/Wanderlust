@@ -3,7 +3,9 @@ const router = express.Router();
 const wrapAsync = require("../utils/wrapAsync.js");
 const Listing = require("../models/listing.models.js");
 const ExpressError = require("../utils/ExpressError.js");
-const { listingSchema, reviewSchema } = require("../schema.js"); // Note: Destructure listingSchema from your schema file
+const { listingSchema } = require("../schema.js"); // Note: Destructure listingSchema from your schema file
+const { connect } = require("mongoose");
+
 
 const validateListing = (req, res, next) => {
   const { error } = listingSchema.validate(req.body);
@@ -34,7 +36,7 @@ router.get("/new", (req, res) => {
 router.post(
   "/",
   validateListing,
-  wrapAsync(async (req, res, next) => {
+ async (req, res, next) => {
     const { listing } = req.body;
 
     // Set default image if none provided
@@ -48,18 +50,22 @@ router.post(
     try {
       const newListing = new Listing(listing);
       await newListing.save();
+      req.flash("success","New Listing Created.")
       res.redirect("/listings");
     } catch (error) {
       console.error("Error saving listing:", error);
       next(error);
     }
-  })
-);
+  });
 
 // Edit route
 router.get("/:id/edit", async (req, res) => {
   const { id } = req.params;
   const listing = await Listing.findById(id);
+  if (!listing) {
+    req.flash("error","Listing you requested for does not exist")
+    res.redirect("/listings")
+  }
   res.render("./listings/edit.ejs", { listing });
 });
 
@@ -69,6 +75,8 @@ router.get("/:id", async (req, res) => {
   try {
     const listing = await Listing.findById(id).populate("reviews");
     if (!listing) {
+      req.flash("error","Listing you requested for does not exist")
+      res.redirect("/listings")
       return res.status(404).send("Listing not found");
     }
     res.render("listings/show.ejs", { listing });
@@ -93,6 +101,7 @@ router.put("/:id", validateListing, async (req, res, next) => {
 
   try {
     await Listing.findByIdAndUpdate(id, { ...updatedListing });
+    req.flash("success","Listing updated successfully.")
     res.redirect(`/listings/${id}`);
   } catch (error) {
     console.error("Error updating listing:", error);
@@ -105,6 +114,7 @@ router.delete("/:id", async (req, res, next) => {
   const { id } = req.params;
   try {
     await Listing.findByIdAndDelete(id);
+    req.flash("success","Listing is deleted.")
     res.redirect("/listings");
   } catch (error) {
     console.error("Error deleting listing:", error);
