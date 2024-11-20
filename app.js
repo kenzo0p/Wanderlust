@@ -5,11 +5,15 @@ const port = 8080;
 const path = require("path");
 const methodOverride = require("method-override");
 const ejsMate = require("ejs-mate");
-const listings = require("./routes/listing.js");
-const reviews = require("./routes/review.js");
+const listingsRouter = require("./routes/listing.js");
+const reviewsRouter = require("./routes/review.js");
 const ExpressError = require("./utils/ExpressError.js");
 const session = require("express-session");
 const flash  = require('connect-flash');
+const passport = require('passport')
+const LocalStrategy = require('passport-local')
+const userRouter = require('./routes/user.js')
+const User = require('./models/user.models.js')
 
 // Connection to MongoDB
 main()
@@ -28,8 +32,8 @@ app.use(methodOverride("_method"));
 app.engine("ejs", ejsMate);
 app.use(express.static(path.join(__dirname, "/public")));
 
-// session
 
+// session
 const sessionOptions = {
   secret: "mysupersecretcode",
   resave: false,
@@ -46,17 +50,43 @@ app.get("/", (req, res) => {
   res.send("I am root");
 });
 
+
+
+// session
 app.use(session(sessionOptions));
 app.use(flash())
+
+
+
+// passport middlware //pbkdf2 hSING ALGORITHM
+app.use(passport.initialize())
+app.use(passport.session())
+passport.use(new LocalStrategy(User.authenticate))
+
+passport.serializeUser(User.serializeUser())
+passport.deserializeUser(User.deserializeUser())
+
+
 
 app.use((req,res,next)=>{
     res.locals.success=req.flash("success");
     res.locals.error=req.flash("error");
     next();
 })
+
+// app.get('/demouser',async(req,res)=>{
+//   let fakeUser = new User({
+//     email:'student@getMaxListeners.com',
+//     username:"deltaStudent"
+//   })
+//   let registeredUser = await User.register(fakeUser ,"helloworld")
+//   res.send(registeredUser)
+// })
+
 // routes
-app.use("/listings", listings); //all listings
-app.use("/listings/:id/reviews", reviews);//all reviews
+app.use("/listings", listingsRouter); //all listings
+app.use("/listings/:id/reviews", reviewsRouter);//all reviews
+app.use('/' ,userRouter)
 
 // Catch-all route for undefined routes
 app.all("*", (req, res, next) => {
