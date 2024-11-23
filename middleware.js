@@ -13,12 +13,12 @@ module.exports.isLoggedIn = (req,res,next) =>{
     next();
 }
 
-module.exports.saveRedirect = (req,res,next)=>{
-    if(req.session.redirectUrl){
-        res.locals.redirectUrl = req.session.redirectUrl;
-    }
-    next();
-}
+module.exports.saveRedirect = (req, res, next) => {
+  if (req.session.redirectUrl) {
+    res.locals.redirectUrl = req.session.redirectUrl;
+  }
+  next();
+};
 
 module.exports.isOwner = async(req,res,next)=>{
     const { id } = req.params;

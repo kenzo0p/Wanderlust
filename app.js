@@ -34,29 +34,29 @@ app.use(express.static(path.join(__dirname, "/public")));
 
 // session
 const sessionOptions = {
-  secret: "mysupersecretcode",
+  secret: 'mysupersecretcode',
   resave: false,
   saveUninitialized: true,
   cookie: {
-    expires: Date.now() + 7 * 24 * 60 * 60 * 1000,
-    maxAge: 7 * 24 * 60 * 60 * 1000,
+    expires: Date.now() + 7 * 24 * 60 * 60 * 1000,  // 7 days expiration
+    maxAge: 7 * 24 * 60 * 60 * 1000,  // 7 days
     httpOnly: true,
   },
 };
 
+// Middleware setup
+app.use(session(sessionOptions));
+app.use(flash());
 // Root route
 app.get("/", (req, res) => {
   res.send("I am root");
 });
 
-// session
-app.use(session(sessionOptions));
-app.use(flash());
 
 // passport middlware //pbkdf2 hSING ALGORITHM
 app.use(passport.initialize());
 app.use(passport.session());
-passport.use(new LocalStrategy(User.authenticate));
+passport.use(new LocalStrategy(User.authenticate()));
 
 passport.serializeUser(User.serializeUser());
 passport.deserializeUser(User.deserializeUser());

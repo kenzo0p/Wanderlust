@@ -39,20 +39,18 @@ router.get("/login", (req, res) => {
   res.render("users/login.ejs");
 });
 
-router.post(
-  "/login",
-  saveRedirect,
-  passport.authenticate("local", {
-    failureRedirect: "/login",
-    failureFlash: true,
-  }),
-  async (req, res) => {
-    req.flash("success", "Welcome back to Wandderlust!");
-    let redirectUrl = res.locals.redirectUrl || "/listings"
-    res.redirect(redirectUrl );
-  }
-);
+router.get("/login",(req,res)=>{
+  res.render("users/login.ejs");
+});
 
+router.post("/login",saveRedirect,passport.authenticate("local",{
+  failureRedirect:'/login',
+  failureFlash:true}),
+  async(req,res)=>{
+      req.flash("success","Welcome back to Wanderlust!");
+      let redirectUrl=res.locals.redirectUrl || "/listings";
+      res.redirect(redirectUrl);
+});
 router.get("/logout", (req, res, next) => {
   req.logOut((err) => {
     if (err) {
