@@ -1,123 +1,133 @@
-const Listing = require("../models/listing.models.js");
-const mbxGeocoding = require("@mapbox/mapbox-sdk/services/geocoding");
-const mapToken = process.env.MAP_TOKEN;
-const geocodingClient = mbxGeocoding({ accessToken: mapToken });
-module.exports.index = async (req, res) => {
-  try {
-    const allListings = await Listing.find({});
-    res.render("listings/index.ejs", { allListings });
-  } catch (error) {
-    console.error("Error fetching listings:", error);
-    res.status(500).send("Internal Server Error");
-  }
-};
+const listing=require('../models/listing.models.js');
+const mbxGeoCoding = require('@mapbox/mapbox-sdk/services/geocoding');
+const mapToken=process.env.MAP_TOKEN;
+const geocodingClient=mbxGeoCoding({ accessToken: mapToken});
 
-module.exports.renderNewForm = (req, res) => {
-  res.render("listings/new.ejs");
-};
-
-module.exports.showListings = async (req, res) => {
-  const { id } = req.params;
-  try {
-    const listing = await Listing.findById(id)
-      .populate({ path: "reviews", populate: { path: "author" } })
-      .populate("owner");
-    if (!listing) {
-      req.flash("error", "Listing you requested for does not exist");
-      res.redirect("/listings");
-      return res.status(404).send("Listing not found");
+module.exports.RenderIndexPage=async(req,res)=>{
+    let {Search,category}=req.query;
+    if((Search===undefined || Search==='') && (category==='' || category===undefined)){
+        let data = await listing.find();
+        res.render('listings/index.ejs',{data});
     }
-    res.render("listings/show.ejs", { listing });
-  } catch (error) {
-    console.error("Error fetching listing:", error);
-    res.status(500).send("Internal Server Error");
-  }
-};
-
-module.exports.createlisting = async (req, res, next) => {
-  const { listing } = req.body;
-
-  // Set default image if none provided
-  if (!listing.image || !listing.image.url) {
-    listing.image = {
-      filename: "listingimage",
-      url: "https://images.unsplash.com/photo-1625505826533-5c80aca7d157?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxzZWFyY2h8MTJ8fGdvYXxlbnwwfHwwfHx8MA%3D%3D&auto=format&fit=crop&w=800&q=60",
-    };
-  }
-  try {
-    let response = await geocodingClient
-      .forwardGeocode({
-        query: listing.location,
-        limit: 1,
-      })
-      .send();
-
-    let url = req.file.path;
-    let filename = req.file.filename;
-    const newListing = new Listing(listing);
-    newListing.owner = req.user._id;
-    newListing.image = { url, filename };
-    newListing.geometry = response.body.features[0].geometry;
-
-    let savedListing = await newListing.save();
-
-    req.flash("success", "New Listing Created.");
-    res.redirect("/listings");
-  } catch (error) {
-    console.error("Error saving listing:", error);
-    next(error);
-  }
-};
-
-module.exports.renderEditForm = async (req, res) => {
-  const { id } = req.params;
-  const listing = await Listing.findById(id);
-  if (!listing) {
-    req.flash("error", "Listing you requested for does not exist");
-    res.redirect("/listings");
-  }
-  let originalImageUrl = listing.image.url;
-  originalImageUrl = originalImageUrl.replace("/upload", "/upload/w_250");
-  res.render("./listings/edit.ejs", { listing, originalImageUrl });
-};
-
-module.exports.updateListing = async (req, res, next) => {
-  const { id } = req.params;
-  const updatedListing = req.body.listing;
-
-  // Set default image if none provided
-  if (!updatedListing.image || !updatedListing.image.url) {
-    updatedListing.image = {
-      filename: "listingimage",
-      url: "https://images.unsplash.com/photo-1625505826533-5c80aca7d157?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxzZWFyY2h8MTJ8fGdvYXxlbnwwfHwwfHx8MA%3D%3D&auto=format&fit=crop&w=800&q=60",
-    };
-  }
-
-  try {
-    let listing = await Listing.findByIdAndUpdate(id, { ...updatedListing });
-    if(typeof req.file !== "undefined") {
-      let filename = req.file.filename;
-      let url = req.file.path;
-      listing.image = {url, filename};
-      await listing.save();
+    else if(category=='' || category==undefined){
+        let Searchdata=await listing.find({$or:[{location:{$regex:Search,$options:'i'}},{country:{$regex:Search,$options:'i'}}]});
+        if(Searchdata.length==0){
+            req.flash('error','Sorry Listing not Available');
+            res.redirect('/listings');
+        }
+        else{
+            res.render('listings/index.ejs',{data:Searchdata});
+        }
+    }
+    else{
+        let categoryData=await listing.find({category:category});
+        if(categoryData.length==0){
+            req.flash('error','Sorry Listing not Available');
+            res.redirect('/listings');
+        }
+        else{
+            res.render('listings/index.ejs',{data:categoryData});
+        }
     }
 
-    req.flash("success", "Listing updated successfully.");
+    // else{
+    //     console.log(Search,category);
+    //     let SearchData=[];
+        // if(category==='' || category===undefined){
+        //     for(let ss of data){
+        //         let des=ss.location;
+        //         let country=ss.country;
+                
+        //         if(Search.toLowerCase()===des.toLowerCase() || Search.toLowerCase()===country.toLowerCase()){
+        //            SearchData.push(ss);
+        //         }
+        //      }
+        // }
+        // else{
+        //     for(let ss of data){
+        //         let Orgcategory=ss.category;
+        //         if(category===Orgcategory){
+        //             SearchData.push(ss);
+        //         }
+        //      }
+        // }
+
+        // if(SearchData.length==0){
+        //     req.flash('error','Sorry Not Available!');
+        //     res.redirect('/listings');
+        // }
+        // else{
+        //     res.render('listings/index.ejs',{data:SearchData});
+        // }
+};
+
+module.exports.RenderNewPage=(req,res)=>{
+    res.render('listings/new.ejs');
+};
+
+module.exports.CreateNewList=async(req,res)=>{
+    let responce=await geocodingClient
+    .forwardGeocode({
+        query: req.body.listing.location+','+req.body.listing.country,
+        limit: 1
+    }).send();
+
+    let url=req.file.path;
+    let filename=req.file.filename;
+    let newList=req.body.listing;
+    newList.owner=req.user._id;
+    //Extracting the URL
+    newList.image={filename,url};
+    newList.geometry=responce.body.features[0].geometry;
+    let list=new listing(newList);
+    await list.save();
+    req.flash('success','new Listing Created');
+    res.redirect('/listings');
+};
+module.exports.RenderEditPage=async(req,res)=>{
+    let {id}=req.params;
+    let list=await listing.findById(id);
+    let imgUrl=list.image.url;
+    imgUrl=imgUrl.replace('/upload','/upload/e_blur:300');
+    res.render('listings/edit.ejs',{list,imgUrl});
+};
+
+module.exports.EditPage=async(req,res)=>{
+    //geting Coordinates
+    let responce=await geocodingClient
+    .forwardGeocode({
+        query: req.body.listing.location+','+req.body.listing.country,
+        limit: 1
+    }).send();
+    //Update List
+    let {id}=req.params;
+    let newListing=req.body;
+    let data=newListing.listing;
+    let Listing = await listing.findByIdAndUpdate(id,{...data});
+    if(typeof req.file!="undefined"){
+        let url=req.file.path;
+        let filename=req.file.filename;
+        Listing.image={filename,url};
+        await Listing.save();
+    }
+    //Update coordinates
+    Listing.geometry=responce.body.features[0].geometry;
+    await Listing.save();
+    req.flash('success','Listing Updated');
     res.redirect(`/listings/${id}`);
-  } catch (error) {
-    console.error("Error updating listing:", error);
-    next(error);
-  }
 };
 
-module.exports.deleteListings = async (req, res, next) => {
-  const { id } = req.params;
-  try {
-    await Listing.findByIdAndDelete(id);
-    req.flash("success", "Listing is deleted.");
-    res.redirect("/listings");
-  } catch (error) {
-    console.error("Error deleting listing:", error);
-    next(error);
-  }
+module.exports.DeletePage=async(req,res)=>{
+    let {id}=req.params;
+    await listing.findByIdAndDelete(id);
+    req.flash('success','List is Deleted');
+    res.redirect(`/listings`);
+};
+
+module.exports.RenderShowPage=async(req,res)=>{
+    let {id}=req.params;
+    const list=await listing.findById(id)
+    .populate({path:'reviews',populate:{path:'owner'}})
+    .populate('owner');
+    res.render('listings/show.ejs',{ list });
 };

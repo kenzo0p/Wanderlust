@@ -7,9 +7,10 @@
     "start": "nodemon app.js"
   },
   "keywords": [],
-  "author": "",
+  "author": "Om",
   "license": "ISC",
   "dependencies": {
+    "@mapbox/mapbox-gl-geocoder": "^5.0.3",
     "@mapbox/mapbox-sdk": "^0.16.1",
     "cloudinary": "^2.5.1",
     "connect-flash": "^0.1.1",
@@ -20,6 +21,7 @@
     "express": "^4.21.1",
     "express-session": "^1.18.1",
     "joi": "^17.13.3",
+    "mapbox-gl": "^3.8.0",
     "method-override": "^3.0.0",
     "mongoose": "^8.7.3",
     "multer": "^1.4.5-lts.1",

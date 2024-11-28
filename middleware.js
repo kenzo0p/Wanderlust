@@ -1,60 +1,41 @@
-const Listing = require('./models/listing.models.js')
-const ExpressError = require("./utils/ExpressError.js");
-const { listingSchema } = require("./schema.js"); // Note: Destructure listingSchema from your schema file
-const { reviewSchema } = require("./schema.js");
-const Review = require('./models/reviews.model.js')
+let listing=require('./models/listing.models.js');
+const review = require('./models/reviews.model.js');
 
-module.exports.isLoggedIn = (req,res,next) =>{
+
+module.exports.LogedIn=(req,res,next)=>{
     if(!req.isAuthenticated()){
-        req.session.redirectUrl = req.originalUrl
-        req.flash('error',"You must be logged in to create listing!");
+        req.session.redirectURL=req.originalUrl;
+        req.flash('error','Login Your Account');
         return res.redirect('/login');
     }
-    next();
+    else{
+        next();
+    }
 }
-
-module.exports.saveRedirect = (req, res, next) => {
-  if (req.session.redirectUrl) {
-    res.locals.redirectUrl = req.session.redirectUrl;
-  }
-  next();
-};
-
-module.exports.isOwner = async(req,res,next)=>{
-    const { id } = req.params;
-    let listing = await Listing.findById(id);
-    if(!listing.owner.equals(res.locals.currUser._id)){
-      req.flash("error","You are not the owner of this listing");
-      return res.redirect(`/listings/${id}`);
+module.exports.SaveRedirectUrl=(req,res,next)=>{
+    if(req.session.redirectURL){
+        res.locals.redirectUrl=req.session.redirectURL;
     }
     next();
 }
-
-module.exports.validateListing = (req, _res, next) => {
-    const { error } = listingSchema.validate(req.body);
-    if (error) {
-      // Use error.details[0].message to provide specific validation feedback
-      return next(new ExpressError(400, error.details[0].message));
-    }
-    next();
-  };
-
-  module.exports.validateReview = (req,res, next) => {
-    console.log("middleware");
-    console.log(req.body.review);
-    const { error } = reviewSchema.validate(req.body);
-    if (error) {
-      // Use error.details[0].message to provide specific validation feedback
-      return next(new ExpressError(400, error.details[0].message));
+module.exports.Owner=async(req,res,next)=>{
+    let {id}=req.params;
+    let list=await listing.findById(id).populate('owner');
+    if(!req.user._id.equals(list.owner._id)){
+        req.flash('error','Your Are Not the Creater of this list');
+        return res.redirect(`/listings/${id}`);    
     }
     next();
 };
-module.exports.isReviewAuthor = async(req,res,next)=>{
-    const { id,reviewId } = req.params;
-    let review = await Review.findById(reviewId);
-    if(!review.author.equals(res.locals.currUser._id)){
-      req.flash("error","You are not the author of this review");
-      return res.redirect(`/listings/${id}`);
+
+module.exports.isAuthor=async(req,res,next)=>{
+    let {id,reviewId}=req.params;
+    let currreview=await review.findById(reviewId);
+    if(currreview.owner.equals(req.user._id)){
+        next();
     }
-    next();
+    else{
+        req.flash('error','Your Are Not the Author of this Review');
+        return res.redirect(`/listings/${id}`);
+    }
 }

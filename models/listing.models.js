@@ -1,65 +1,53 @@
-const mongoose = require("mongoose");
-const Schema = mongoose.Schema;
-const Review = require("./reviews.model.js");
-const imageSchema = new Schema({
-  filename: {
-    type: String,
-    default: "listingimage",
-  },
-  url: {
-    type: String,
-    required: true, // Mark URL as required
-    default:
-      "https://images.unsplash.com/photo-1625505826533-5c80aca7d157?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxzZWFyY2h8MTJ8fGdvYXxlbnwwfHwwfHx8MA%3D%3D&auto=format&fit=crop&w=800&q=60",
-    set: (v) =>
-      v === ""
-        ? "https://images.unsplash.com/photo-1625505826533-5c80aca7d157?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxzZWFyY2h8MTJ8fGdvYXxlbnwwfHwwfHx8MA%3D%3D&auto=format&fit=crop&w=800&q=60"
-        : v,
-  },
-});
+const mongoose=require('mongoose');
+const {Schema}=mongoose;
+const review=require('./reviews.model.js');
 
-const listingSchema = new Schema({
-  title: {
-    type: String,
-    required: true,
-  },
-  description: String,
-  image: {
-    type: String,
-    type: imageSchema, // Use the defined image schema
-  },
-  price: {
-    type: Number,
-    required: true, // Consider marking price as required too
-  },
-  location: String,
-  country: String,
-  reviews: [
-    {  
-      type: Schema.Types.ObjectId,
-      ref: "Review",
+const listingSchema=new Schema({
+    title:{
+        type:String,
+        required:true
     },
-  ],
-  owner:{
-    type:Schema.Types.ObjectId,
-    ref:"User"
-  },
-  geometry:{
-    type: {
-      type: String,
-      enum: ["Point"],
-      required: true
+    description:String,
+    image:{
+        filename:String,
+        url:String,
+    },
+    category:{
+        type:String,
+        enum:['Trending','Rooms','Iconic Center','mountains','castles','Amazing pools','Camping','farms','Arctic','Domes','Boats','Creative Spaces','Golfing','Beach'],
+        required:true,
+    },
+    price:Number,
+    location:String,
+    country:String,
+    reviews:[{
+        type:Schema.Types.ObjectId,
+        ref:'review',
+    },],
+    owner:{
+        type:Schema.Types.ObjectId,
+        ref:'user',
+    },
+    geometry:{
+        type:{
+            type:String,
+            enum:['Point'],
+            required:true
+        },
+        coordinates:{
+            type:[Number],
+            required:true,
+        }
     }
-  },
-  coordinates:{
-    type:[Number],
-    required:true
-  }
+   
 });
 
-listingSchema.post("findOneAndDelete", async (listing) => {
-  await Review.deleteMany({ _id: { $in: listing.reviews } });
+listingSchema.post('findOneAndDelete',async(listing)=>{
+    if(listing){
+        await review.deleteMany({_id:{$in:listing.reviews}});
+    }
 });
 
-const Listing = mongoose.model("Listing", listingSchema);
-module.exports = Listing;
+const listing = mongoose.model('listing',listingSchema);
+module.exports=listing;
+
