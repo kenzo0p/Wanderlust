@@ -33,19 +33,27 @@ document.addEventListener("DOMContentLoaded", function () {
   const leftBtn = document.querySelector(".left-btn");
   const rightBtn = document.querySelector(".right-btn");
   const filtersContainer = document.getElementById("filters-container");
-  const filters = document.getElementById("filters");
 
+  // Width of each filter item plus gap
   const filterWidth = document.querySelector(".filter").offsetWidth + 32;
 
+  // Smooth scroll on button clicks
   leftBtn.addEventListener("click", function () {
-    filtersContainer.scrollLeft -= filterWidth;
+    filtersContainer.scrollBy({
+      left: -filterWidth,
+      behavior: "smooth",
+    });
   });
 
   rightBtn.addEventListener("click", function () {
-    filtersContainer.scrollLeft += filterWidth;
+    filtersContainer.scrollBy({
+      left: filterWidth,
+      behavior: "smooth",
+    });
   });
 });
 
+// Smooth touch scrolling
 document.addEventListener("DOMContentLoaded", function () {
   const container = document.getElementById("filters-container");
 
@@ -53,13 +61,14 @@ document.addEventListener("DOMContentLoaded", function () {
   let scrollLeft;
 
   container.addEventListener("touchstart", (e) => {
-    startX = e.touches[0].pageX;
-    scrollLeft = container.scrollLeft;
+    startX = e.touches[0].pageX; // Starting touch position
+    scrollLeft = container.scrollLeft; // Current scroll position
   });
 
   container.addEventListener("touchmove", (e) => {
-    const x = e.touches[0].pageX;
-    const walk = startX - x;
-    container.scrollLeft = scrollLeft + walk;
+    const x = e.touches[0].pageX; // Current touch position
+    const walk = startX - x; // Difference between start and current
+    container.scrollLeft = scrollLeft + walk; // Set new scroll position
   });
 });
+

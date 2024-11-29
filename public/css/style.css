@@ -379,7 +379,7 @@ body {
  }
  
  .search-btn:hover {
-   background-color: #fe424d;
+   background-color: #ff969f;
    color: #fff;
  }
  .search-btn:active {
@@ -448,7 +448,7 @@ body {
    margin-left: -0.5rem !important;
    margin-right: auto !important;
    padding-left: 0 !important;
-   font-family: "Kaushan Script", cursive;
+   font-family: "Great Vibes", cursive;
  }
  
  .navbar-nav {
@@ -460,6 +460,7 @@ body {
  
  .fa-circle-user {
    font-size: 1.5rem;
+   color: #222222;
  }
  
  @media (max-width: 767px) {
@@ -539,4 +540,9 @@ body {
    text-align: center;
    margin-bottom: -1rem;
  }
- 
+ .dropdown-btn:hover{
+  background-color: #fff !important;
+ }
+ .dropdown-btn:focus{
+  background-color: #fff !important;
+ }
