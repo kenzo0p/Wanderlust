@@ -1,7 +1,10 @@
 {
+  "engines":{
+    "node":"22.11.0"
+  },
   "name": "wanderlust",
   "version": "1.0.0",
-  "description": "��#\u0000 \u0000W\u0000a\u0000n\u0000d\u0000e\u0000r\u0000l\u0000u\u0000s\u0000t\u0000\r\u0000 \u0000",
+  "description": "A travel and accommodation platform inspired by Airbnb, offering users a variety of unique stays and experiences worldwide. Explore iconic cities, serene mountain cabins, beachfront escapes, and more, with seamless browsing and booking functionality.",
   "main": "index.js",
   "scripts": {
     "start": "nodemon app.js"

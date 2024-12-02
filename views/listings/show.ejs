@@ -44,15 +44,15 @@
                 </div>
                 <div class="show-btns d-flex flex-column flex-md-row justify-content-center gap-2 gap-md-3">
                     <form action="/listings/<%=listing._id%>/reservelisting" method="GET">
-                        <button class="btn btn-success reserve-btn">Reserve</button>
+                        <button class="btn btn-outline-success reserve-btn">Reserve</button>
                     </form>
                 </div>
                 <% if(currUser && currUser._id.equals(listing.owner._id)){ %>
                     <div class="show-btns d-flex flex-column flex-md-row justify-content-center gap-2 gap-md-3 mt-3">
-                        <a href="/listings/<%= listing._id %>/edit" class="btn btn-danger mb-2 mb-md-0">Edit this
+                        <a href="/listings/<%= listing._id %>/edit" class="btn btn-outline-danger mb-2 mb-md-0">Edit this
                             Listing</a>
                         <form action="/listings/<%= listing._id %>?_method=DELETE" method="post">
-                            <button type="submit" class="btn btn-dark">Delete this Listing</button>
+                            <button type="submit" class="btn btn-outline-dark">Delete this Listing</button>
                         </form>
                     </div>
                     <%}%>
@@ -90,7 +90,7 @@
                                     </div>
                                     <div
                                         class="show-btns d-flex flex-column flex-md-row justify-content-center gap-2 gap-md-3">
-                                        <button class="btn btn-dark">Submit</button>
+                                        <button class="btn btn-outline-dark">Submit</button>
                                     </div>
                                 </form>
                             </div>
@@ -128,7 +128,7 @@
                                                                     action="/listings/<%=listing._id%>/reviews/<%=review._id%>?_method=DELETE"
                                                                     method="POST">
                                                                     <button
-                                                                        class="btn btn-sm btn-danger mt-2">Delete</button>
+                                                                        class="btn btn-sm btn-outline-danger mt-2">Delete</button>
                                                                 </form>
                                                                 <% } %>
                                                         </div>
@@ -153,7 +153,7 @@
                                                 <i class="ri-wifi-line"><span> Wifi</span></i>
                                             </div>
                                             <div class="d-flex justify-content-center mt-2">
-                                                <button id="offers" type="button" class="btn btn-dark"
+                                                <button id="offers" type="button" class="btn btn-outline-success"
                                                     data-bs-toggle="modal" data-bs-target="#exampleModal">
                                                     Show all amenities
                                                 </button>
@@ -228,7 +228,7 @@
                                                             </ul>
                                                         </div>
                                                         <div class="modal-footer d-flex justify-content-center">
-                                                            <button type="button" class="btn btn-danger"
+                                                            <button type="button" class="btn btn-outline-danger"
                                                                 data-bs-dismiss="modal">Close</button>
                                                         </div>
                                                     </div>
