@@ -7,7 +7,7 @@
   "description": "A travel and accommodation platform inspired by Airbnb, offering users a variety of unique stays and experiences worldwide. Explore iconic cities, serene mountain cabins, beachfront escapes, and more, with seamless browsing and booking functionality.",
   "main": "index.js",
   "scripts": {
-    "start": "nodemon app.js"
+    "start": "node app.js"
   },
   "keywords": [],
   "author": "Om",
